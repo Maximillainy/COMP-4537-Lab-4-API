@@ -23,7 +23,6 @@ http.createServer(function (req, res) {
      * }
      */
     if (req.method === "GET") {
-        console.log("Recieved GET request!");
         numRequests++;
         const query = url.parse(req.url, true).query;
         const word = query.word;
@@ -39,7 +38,6 @@ http.createServer(function (req, res) {
             res.writeHead(400, { 'Content-Type': 'apllication/json' });
             res.write(JSON.stringify({ request: numRequests, definition: "Invalid input!" }));
         }
-        console.log("res" + res);
         res.end();
     }
 
@@ -51,7 +49,6 @@ http.createServer(function (req, res) {
      * If a definition exists, respond: "Definition already exists!"
      */
     if (req.method === 'POST' && req.url === endPoint) {
-        console.log("Recieved POST request!");
         numRequests++;
         let body = '';
          req.on('data', function (chunk) {
@@ -65,11 +62,8 @@ http.createServer(function (req, res) {
             let query = JSON.parse(body);
             const word = query.word;
             const definition = query.definition;
-            console.log('word:', word);
-            console.log('definition:', definition);
 
             if (functions.validateInput(word) && functions.validateInput(definition)) {
-                console.log("verified input");
                 if (dictionary[word]) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.write(JSON.stringify({ request: numRequests, response: "Definition already exists!" }));
@@ -79,7 +73,6 @@ http.createServer(function (req, res) {
                     res.write(JSON.stringify({ request: numRequests, response: "Seccessfully added word: " + word}));
                 }
             } else {
-                console.log("invalid input");
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.write(JSON.stringify({ request: numRequests, response: "Invalid input!" }));
             }
@@ -87,8 +80,6 @@ http.createServer(function (req, res) {
         })
         
     }
-
-    console.log('Dictionary:', dictionary);
 
 }).listen(8080);
 
