@@ -8,13 +8,6 @@ let dictionary = {};
 
 http.createServer(function (req, res) {
     const reqPath = url.parse(req.url, true).pathname;
-
-    // res.writeHead(200, {
-    //     'Content-Type': 'application/json',
-    //     'Access-Control-Allow-Origin': '*',
-    //     'Access-Control-Allow-Methods': 'GET, POST',
-    // });
-
     res.setHeader(
         'Content-Type', 'application/json',
         'Access-Control-Allow-Origin', '*',
@@ -22,7 +15,7 @@ http.createServer(function (req, res) {
 
     /**
      * Client Request:
-     * GET /api/definitions/?word=boo
+     * GET /api/definitions/?word=book
      * 
      * Response format:
      * {
@@ -60,6 +53,13 @@ http.createServer(function (req, res) {
      * 
      * Save entry to array in memory, no persistent storage
      * If a definition exists, respond: "Definition already exists!"
+     * 
+     * 
+     * Response format:
+     * {
+     * "request": 102,
+     * "responce": "Successfully added word: book"
+     * }
      */
     if (req.method === 'POST' && reqPath === endPoint) {
         numRequests++;
