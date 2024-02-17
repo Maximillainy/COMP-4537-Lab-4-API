@@ -15,5 +15,5 @@
 exports.validateInput =
 function (input) {
     const pattern = /^[A-Za-z](?:\s?[A-Za-z]+)*$/;
-    return pattern.test(input) && input.length > 0;
+    return typeof input === "string" && pattern.test(input) && input.length > 0;
 };
