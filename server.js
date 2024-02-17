@@ -1,7 +1,6 @@
 const http = require('http');
 const url = require('url');
 const functions = require('./modules/utils');
-const { json } = require('express');
 
 const endPoint = "/api/definitions/"
 let numRequests = 0;
