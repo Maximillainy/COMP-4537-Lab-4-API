@@ -8,13 +8,17 @@ let dictionary = {};
 
 http.createServer(function (req, res) {
     const reqPath = url.parse(req.url, true).pathname;
-    numRequests++;
 
-    res.writeHead(200, {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST',
-    });
+    // res.writeHead(200, {
+    //     'Content-Type': 'application/json',
+    //     'Access-Control-Allow-Origin': '*',
+    //     'Access-Control-Allow-Methods': 'GET, POST',
+    // });
+
+    res.setHeader(
+        'Content-Type', 'application/json',
+        'Access-Control-Allow-Origin', '*',
+        'Access-Control-Allow-Methods', 'GET, POST');
 
     /**
      * Client Request:
@@ -27,20 +31,26 @@ http.createServer(function (req, res) {
      * }
      */
     if (req.method === "GET" && reqPath === endPoint) {
+        numRequests++;
         const query = url.parse(req.url, true).query;
         const word = query.word;
-        if (functions.validateInput(word)) {
-            if (dictionary[word]) {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.write(JSON.stringify({ request: numRequests, definition: dictionary[word] }));
+        try {
+            if (functions.validateInput(word)) {
+                if (dictionary[word]) {
+                    // res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.write(JSON.stringify({ request: numRequests, definition: dictionary[word] }));
+                } else {
+                    // res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.write(JSON.stringify({ request: numRequests, definition: "Word not found!" }));
+                }
             } else {
-                res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.write(JSON.stringify({ request: numRequests, definition: "Word not found!" }));
+                throw new Error("Invalid input!");
             }
-        } else {
-            res.writeHead(400, { 'Content-Type': 'application/json' });
+        } catch (error) {
+            // res.writeHead(400, { 'Content-Type': 'application/json' });
             res.write(JSON.stringify({ request: numRequests, definition: "Invalid input!" }));
         }
+        
         res.end();
     }
 
@@ -52,6 +62,7 @@ http.createServer(function (req, res) {
      * If a definition exists, respond: "Definition already exists!"
      */
     if (req.method === 'POST' && reqPath === endPoint) {
+        numRequests++;
         let body = '';
          req.on('data', function (chunk) {
             if (chunk != null) {
@@ -60,26 +71,32 @@ http.createServer(function (req, res) {
         });
 
         req.on('end', function () {
-            console.log(body);
-            let query = JSON.parse(body);
-            const word = query.word;
-            const definition = query.definition;
+            try {
+                console.log(body);
+                let query = JSON.parse(body);
+                const word = query.word;
+                const definition = query.definition;
 
-            if (functions.validateInput(word) && functions.validateInput(definition)) {
-                if (dictionary[word]) {
-                    res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.write(JSON.stringify({ request: numRequests, response: "Word already exists!" }));
+                if (functions.validateInput(word) && functions.validateInput(definition)) {
+                    if (dictionary[word]) {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.write(JSON.stringify({ request: numRequests, response: "Word already exists!" }));
+                    } else {
+                        dictionary[word] = definition;
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.write(JSON.stringify({ request: numRequests, response: "Successfully added word: " + word}));
+                    }
                 } else {
-                    dictionary[word] = definition;
-                    res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.write(JSON.stringify({ request: numRequests, response: "Successfully added word: " + word}));
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.write(JSON.stringify({ request: numRequests, response: "Invalid input!" }));
                 }
-            } else {
-                res.writeHead(400, { 'Content-Type': 'application/json' });
+            } catch (error) {
                 res.write(JSON.stringify({ request: numRequests, response: "Invalid input!" }));
+
             }
             res.end();
         })
+        
         
     }
 
