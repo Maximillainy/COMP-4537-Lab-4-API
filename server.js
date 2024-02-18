@@ -6,12 +6,14 @@ const endPoint = "/api/definitions/"
 let numRequests = 0;
 let dictionary = {};
 
+const DEFAULT_HEADERS = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST'
+}
+
 http.createServer(function (req, res) {
     const reqPath = url.parse(req.url, true).pathname;
-    res.setHeader(
-        'Content-Type', 'application/json',
-        'Access-Control-Allow-Origin', '*',
-        'Access-Control-Allow-Methods', 'GET, POST');
 
     /**
      * Client Request:
@@ -30,20 +32,20 @@ http.createServer(function (req, res) {
         try {
             if (functions.validateInput(word)) {
                 if (dictionary[word]) {
-                    res.writeHead(200);
+                    res.writeHead(200, DEFAULT_HEADERS);
                     res.write(JSON.stringify({ request: numRequests, definition: dictionary[word] }));
                 } else {
-                    res.writeHead(400);
+                    res.writeHead(400, DEFAULT_HEADERS);
                     res.write(JSON.stringify({ request: numRequests, definition: "Word not found!" }));
                 }
             } else {
                 throw new Error("Invalid input!");
             }
         } catch (error) {
-            res.writeHead(400);
+            res.writeHead(400, DEFAULT_HEADERS);
             res.write(JSON.stringify({ request: numRequests, definition: "Invalid input!" }));
         }
-        
+
         res.end();
     }
 
@@ -79,15 +81,15 @@ http.createServer(function (req, res) {
 
                 if (functions.validateInput(word) && functions.validateInput(definition)) {
                     if (dictionary[word]) {
-                        res.writeHead(400);
+                        res.writeHead(400, DEFAULT_HEADERS);
                         res.write(JSON.stringify({ request: numRequests, response: "Word already exists!" }));
                     } else {
                         dictionary[word] = definition;
-                        res.writeHead(200);
+                        res.writeHead(200, DEFAULT_HEADERS);
                         res.write(JSON.stringify({ request: numRequests, response: "Successfully added word: " + word}));
                     }
                 } else {
-                    res.writeHead(400);
+                    res.writeHead(400, DEFAULT_HEADERS);
                     res.write(JSON.stringify({ request: numRequests, response: "Invalid input!" }));
                 }
             } catch (error) {
