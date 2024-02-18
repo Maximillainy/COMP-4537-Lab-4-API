@@ -28,7 +28,7 @@ http.createServer(function (req, res) {
     if (req.method === "GET" && reqPath === endPoint) {
         numRequests++;
         const query = url.parse(req.url, true).query;
-        const word = query.word;
+        const word = query.word.toLowerCase();
         try {
             if (functions.validateInput(word)) {
                 if (dictionary[word]) {
@@ -76,7 +76,7 @@ http.createServer(function (req, res) {
             try {
                 console.log(body);
                 let query = JSON.parse(body);
-                const word = query.word;
+                const word = query.word.toLowerCase();
                 const definition = query.definition;
 
                 if (functions.validateInput(word) && functions.validateInput(definition)) {
